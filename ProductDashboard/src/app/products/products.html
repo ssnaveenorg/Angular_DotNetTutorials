@@ -1,0 +1,200 @@
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h3 class="mb-0 fw-semibold">Product Dashboard</h3>
+    </div>
+  </div>
+
+  <!-- Summary + Filters Card -->
+  @let s = productService.getSummary(view);
+
+  <div class="card shadow-sm border-0 mb-3">
+    <div class="card-body py-3">
+
+      <!-- Top Summary Row -->
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+
+        <!-- Title -->
+        <div class="d-flex align-items-center gap-2">
+          <span class="fw-semibold">Products</span>
+          <span class="text-muted small">({{ view.length }} shown)</span>
+        </div>
+
+        <!-- Summary Badges -->
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge rounded-pill text-bg-light border text-dark">
+            Total: {{ s.total }}
+          </span>
+          <span class="badge rounded-pill text-bg-light border text-dark">
+            Active: {{ s.active }}
+          </span>
+          <span class="badge rounded-pill text-bg-warning">
+            Low Stock: {{ s.lowStock }}
+          </span>
+          <span class="badge rounded-pill text-bg-info">
+            Value: ₹{{ s.inventoryValue | number:'1.0-0' }}
+          </span>
+        </div>
+
+      </div>
+
+      <hr class="my-2">
+
+      <!-- Filters Row -->
+      <div class="row g-2 align-items-center">
+
+        <!-- Search -->
+        <div class="col-12 col-lg-5">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-white">🔍</span>
+            <input
+              class="form-control"
+              placeholder="Search by name / SKU / brand"
+              [(ngModel)]="searchText"
+              (input)="applyFilters()"
+            />
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="col-6 col-lg-2">
+          <select
+            class="form-select form-select-sm"
+            [(ngModel)]="category"
+            (change)="applyFilters()">
+            @for (c of categories(); track c) {
+              <option [ngValue]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Stock -->
+        <div class="col-6 col-lg-2">
+          <select
+            class="form-select form-select-sm"
+            [(ngModel)]="stock"
+            (change)="applyFilters()">
+            <option [ngValue]="'All'">All Stock</option>
+            <option [ngValue]="'InStock'">In Stock</option>
+            <option [ngValue]="'LowStock'">Low Stock</option>
+            <option [ngValue]="'OutOfStock'">Out of Stock</option>
+          </select>
+        </div>
+
+        <!-- Sort -->
+        <div class="col-8 col-lg-2">
+          <select
+            class="form-select form-select-sm"
+            [(ngModel)]="sort"
+            (change)="applyFilters()">
+            <option [ngValue]="'name'">Sort: Name</option>
+            <option [ngValue]="'priceAsc'">Sort: Price ↑</option>
+            <option [ngValue]="'priceDesc'">Sort: Price ↓</option>
+            <option [ngValue]="'ratingDesc'">Sort: Rating</option>
+          </select>
+        </div>
+
+        <!-- Reset -->
+        <div class="col-4 col-lg-1 d-grid">
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            (click)="reset()">
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Table -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+
+          <thead class="table-light">
+            <tr>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>Brand</th>
+              <th>Category</th>
+              <th class="text-end">Final Price</th>
+              <th class="text-center">Stock</th>
+              <th class="text-center">Status</th>
+              <th class="text-center">Rating</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @if (view.length === 0) {
+              <tr>
+                <td colspan="8" class="text-center py-4 text-muted">
+                  No products match your current filters.
+                </td>
+              </tr>
+            } @else {
+
+              @for (p of view; track p.id) {
+                <tr>
+
+                  <!-- Product -->
+                  <td>
+                    <div class="fw-semibold">{{ p.name }}</div>
+                    <div class="text-muted small">
+                      Base: ₹{{ p.basePrice | number:'1.0-0' }}
+                      • Discount: {{ p.discountPercent }}%
+                      • GST: {{ p.taxPercent }}%
+                    </div>
+                  </td>
+
+                  <td class="text-muted">{{ p.sku }}</td>
+                  <td>{{ p.brand }}</td>
+
+                  <td>
+                    <span class="fw-semibold">{{ p.category }}</span>
+                  </td>
+
+                  <!-- Final Price -->
+                  <td class="text-end fw-semibold text-success">
+                    ₹{{ productService.getFinalPrice(p) | number:'1.0-0' }}
+                  </td>
+
+                  <!-- Stock -->
+                  <td class="text-center">
+                    <span class="badge rounded-pill"
+                      [class.text-bg-success]="p.stockQty > p.reorderLevel"
+                      [class.text-bg-warning]="productService.isLowStock(p)"
+                      [class.text-bg-danger]="p.stockQty <= 0">
+                      {{ p.stockQty }}
+                    </span>
+                  </td>
+
+                  <!-- Status -->
+                  <td class="text-center">
+                    <span class="badge rounded-pill"
+                      [class.text-bg-success]="p.isActive"
+                      [class.text-bg-danger]="!p.isActive">
+                      {{ p.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+
+                  <!-- Rating -->
+                  <td class="text-center">
+                    <span class="badge rounded-pill text-bg-info">
+                      ⭐ {{ p.rating }}
+                    </span>
+                  </td>
+
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
