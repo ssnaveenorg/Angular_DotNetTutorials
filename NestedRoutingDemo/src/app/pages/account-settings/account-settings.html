@@ -1,1 +1,52 @@
-<p>account-settings works!</p>
+<nav class="mb-3">
+  <span class="text-muted small">Account</span>
+  <span class="text-muted small"> / </span>
+  <span class="fw-semibold small">Settings</span>
+</nav>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-primary text-white">Profile</div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">Full Name</label>
+          <input class="form-control" [value]="profile.fullName" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Phone</label>
+          <input class="form-control" [value]="profile.phone" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">City</label>
+          <input class="form-control" [value]="profile.city" />
+        </div>
+
+        <button class="btn btn-primary" (click)="save()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-dark text-white">Preferences</div>
+      <div class="card-body">
+        @for (p of preferences; track p.key) {
+          <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+            <div class="fw-semibold">{{ p.label }}</div>
+
+            <button class="btn btn-sm"
+                    [class.btn-success]="p.enabled"
+                    [class.btn-outline-secondary]="!p.enabled"
+                    (click)="toggle(p.key)">
+              @if (p.enabled) { Enabled } @else { Disabled }
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+

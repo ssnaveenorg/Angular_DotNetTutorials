@@ -1,1 +1,97 @@
-<p>account works!</p>
+<!--
+  This is the PARENT (layout) template for the Account section.
+
+  IMPORTANT:
+  - This page stays visible while navigating between child routes.
+  - Only the content inside <router-outlet> (right side) changes.
+  - Example child URLs:
+      /account/overview
+      /account/orders
+      /account/settings
+-->
+
+<div class="container-fluid">
+  <div class="row g-3">
+
+    <!--
+      LEFT SIDE: Sidebar column
+      - On large screens (lg and above), sidebar takes 3 columns out of 12
+      - On small screens, it becomes full width (col-12)
+    -->
+    <div class="col-12 col-lg-3">
+
+      <!-- Sidebar card container -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <!--
+            Profile section (dummy data)
+            - Shows user avatar + name + role
+            - Replace these values with dynamic binding later if needed:
+              {{ profile.name }}, {{ profile.role }}, etc.
+          -->
+          <div class="d-flex align-items-center gap-2 mb-3">
+
+            <!-- Simple avatar circle (first letter of name) -->
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                 style="width: 42px; height: 42px;">
+              P
+            </div>
+
+            <!-- User name and role -->
+            <div>
+              <div class="fw-semibold">{{profile.name}}</div>
+              <div class="text-muted small">{{profile.role}}</div>
+            </div>
+          </div>
+
+          <!-- Additional profile info -->
+          <div class="text-muted small mb-1">{{profile.email}}</div>
+          <div class="text-muted small mb-3">Last login: {{profile.lastLogin}}</div>
+
+          <!--
+            Navigation Menu (Account Child Routes)
+            - Uses the navLinks array from account.ts
+            - routerLink navigates to child paths relative to /account
+              e.g., "overview" => /account/overview
+            - routerLinkActive adds "active" class to the clicked link
+          -->
+          <div class="list-group">
+            @for (link of navLinks; track link.path) {
+              <a class="list-group-item list-group-item-action"
+                 routerLink="{{ link.path }}"
+                 routerLinkActive="active">
+                {{ link.label }}
+              </a>
+            }
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!--
+      RIGHT SIDE: Content column
+      - On large screens, content takes 9 columns out of 12
+      - This area displays the currently selected child component
+    -->
+    <div class="col-12 col-lg-9">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <!--
+            Child Route Placeholder
+            - Angular renders the matched child component here.
+            - When user clicks:
+                Overview -> loads AccountOverview component here
+                Orders   -> loads AccountOrders component here
+                Settings -> loads AccountSettings component here
+          -->
+          <router-outlet></router-outlet>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
