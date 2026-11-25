@@ -1,28 +1,23 @@
-// Used to configure the app in a standalone Angular setup
-import { ApplicationConfig } from '@angular/core'; 
+// Type used to configure the app
+import { ApplicationConfig } from '@angular/core';   
 
-// provideRouter      -> registers the router and our route list
-// withPreloading     -> enables preloading support
-// PreloadAllModules  -> built-in strategy: preload ALL lazy routes in the background
-import { provideRouter, withPreloading, PreloadAllModules } from '@angular/router'; 
+// provideRouter = register routes
+// withPreloading = enable a preloading strategy        
+import { provideRouter, withPreloading } from '@angular/router'; 
 
-// The routes array (Home, Catalog, Reports, Admin, etc.)
-import { routes } from './app.routes'; 
+// All routes (Home, Catalog, Reports, Admin)
+import { routes } from './app.routes';    
 
-// Application-wide configuration for a standalone Angular app
+// Our custom logic: preload only routes with data.preload = true
+import { SelectivePreloading } from './selective-preloading';   
+
 export const appConfig: ApplicationConfig = {
   providers: [
-
-    // Register routes and turn on preloading
-    // PreloadAllModules means: after the app loads, Angular downloads all lazy route bundles automatically
+    // Registers Angular Router with our routes
+    // and tells Angular Router to use SelectivePreloading for preloading logic
     provideRouter(
-
-      routes, // All route definitions (eager and lazy)
-
-      // Enables preloading support in Angular routing
-      // PreloadAllModules tells Angular to preload
-      // ALL lazy-loaded routes in the background
-      withPreloading(PreloadAllModules)
+      routes,                             // Route definitions
+      withPreloading(SelectivePreloading) // Enable selective preloading strategy
     ),
   ],
 };
